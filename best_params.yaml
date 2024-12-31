@@ -6,3 +6,7 @@ hidden_size: 224
 learning_rate: 0.00042631974982415284
 num_layers: 4
 weight_decay: 3.0119425325804118e-05
+
+
+TODO: Analyze my_study.db with optuna's dashboard
+TODO: Try the new params on the model
