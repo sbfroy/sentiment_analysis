@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, trial=None, early_stopping=None):
+def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, gradient_clip_val, trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -23,7 +23,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         train_preds = []
         train_targets = []
 
-        for batch in tqdm(train_loader, leave=False, ncols=100):
+        for batch in tqdm(train_loader, desc='Training', leave=False, ncols=75, disable=not verbose):
             inputs = batch['input_ids'].to(device)
             masks = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
@@ -31,8 +31,9 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
             optimizer.zero_grad()
 
             outputs = model(inputs, masks).squeeze()
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels.to(device))
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip_val)
             optimizer.step()
 
             train_preds.extend(outputs.detach().cpu().numpy())  
@@ -47,13 +48,13 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         val_targets = []
 
         with torch.no_grad():
-            for batch in tqdm(val_loader, leave=False, ncols=100):
+            for batch in tqdm(val_loader, desc=' Validation', leave=False, ncols=75, disable=not verbose):
                 inputs = batch['input_ids'].to(device)
                 masks = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
 
                 outputs = model(inputs, masks).squeeze()
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs, labels.to(device))
 
                 val_preds.extend(outputs.detach().cpu().numpy()) 
                 val_targets.extend(labels.cpu().numpy())
@@ -67,11 +68,12 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         history['val_rmse'].append(val_rmse)
         history['val_r2'].append(val_r2)
 
-        print(
-            f"Epoch {epoch+1}/{num_epochs} | "
-            f"Train RMSE: {train_rmse:.4f}, Train R^2: {train_r2:.4f} | "
-            f"Val RMSE: {val_rmse:.4f}, Val R^2: {val_r2:.4f}"
-            )
+        if verbose:
+            print(
+                f"Epoch {epoch+1}/{num_epochs} | "
+                f"Train RMSE: {train_rmse:.4f}, Train R^2: {train_r2:.4f} | "
+                f"Val RMSE: {val_rmse:.4f}, Val R^2: {val_r2:.4f}"
+                )
 
         # Optuna
         if trial:
