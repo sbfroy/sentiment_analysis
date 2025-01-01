@@ -7,7 +7,7 @@ model:
 
 training:
   batch_size: 32
-  num_epochs: 15
+  num_epochs: 20
   learning_rate: 0.00042631974982415284
   weight_decay: 3.0119425325804118e-05
   patience: 3
