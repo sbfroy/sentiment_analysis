@@ -1,17 +1,18 @@
 model:
   vocab_size: 119547 # tokenizer.vocab_size
-  embed_size: 128 # 256
-  hidden_size: 96
+  embed_size: 128
+  hidden_size: 224
   num_layers: 4
   dropout: 0.4
 
 training:
   batch_size: 32
   num_epochs: 15
-  learning_rate: 0.001
-  weight_decay: 0
+  learning_rate: 0.00042631974982415284
+  weight_decay: 3.0119425325804118e-05
   patience: 3
   min_delta: 0.01
+  gradient_clip_val: 0.16803154203784526
 
 data:
   max_seq_len: 768
