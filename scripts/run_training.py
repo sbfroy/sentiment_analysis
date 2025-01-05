@@ -61,7 +61,9 @@ history = train_model(
     criterion=criterion,
     batch_size=config['training']['batch_size'],
     num_epochs=config['training']['num_epochs'],
-    device='cuda' if torch.cuda.is_available() else 'cpu'
+    device='cuda' if torch.cuda.is_available() else 'cpu',
+    gradient_clip_val=config['training']['gradient_clip_val'],
+    early_stopping=early_stopping
 )
 
 # Create individual folders
