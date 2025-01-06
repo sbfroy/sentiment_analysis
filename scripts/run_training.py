@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from transformers import AutoTokenizer
 from src.utils.config_loader import load_config
 from src.utils.seed import seed_everything
@@ -48,6 +49,8 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
+scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
+
 criterion = nn.MSELoss() 
 
 early_stopping = EarlyStopping(patience=config['training']['patience'], 
@@ -58,6 +61,7 @@ history = train_model(
     train_dataset=train_dataset,
     val_dataset=val_dataset,
     optimizer=optimizer,
+    scheduler=scheduler,
     criterion=criterion,
     batch_size=config['training']['batch_size'],
     num_epochs=config['training']['num_epochs'],
