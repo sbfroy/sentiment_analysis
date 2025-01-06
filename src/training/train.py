@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, gradient_clip_val, trial=None, early_stopping=None, verbose=True):
+def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criterion, batch_size, num_epochs, device, gradient_clip_val, trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -14,7 +14,8 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
     model.to(device)
 
     history = {'train_rmse': [], 'val_rmse': [],
-               'train_r2': [], 'val_r2': []}
+               'train_r2': [], 'val_r2': [],
+               'lr': []}
 
     for epoch in range(num_epochs):
 
@@ -62,11 +63,16 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         val_rmse = np.sqrt(mean_squared_error(val_targets, val_preds))
         val_r2 = r2_score(val_targets, val_preds)
 
+        scheduler.step()
+
+        current_lr = scheduler.get_last_lr()[0] 
+
         # Logging
         history['train_rmse'].append(train_rmse)
         history['train_r2'].append(train_r2)
         history['val_rmse'].append(val_rmse)
         history['val_r2'].append(val_r2)
+        history['lr'].append(current_lr)
 
         if verbose:
             print(
