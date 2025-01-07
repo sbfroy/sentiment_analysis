@@ -1,7 +1,0 @@
-dropout: 0.2
-gradient_clip_val: 0.1400781042965029
-hidden_size: 160
-learning_rate: 0.0003959929157116884
-max_seq_len: 256
-num_layers: 4
-weight_decay: 2.4625651063428652e-05
