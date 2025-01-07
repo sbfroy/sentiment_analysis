@@ -13,6 +13,7 @@ from src.utils.seed import seed_everything
 from src.data.dataset import TokenizedDataset
 from src.data.preprocessing import create_df
 from src.models.lstm_model import LSTM
+from src.models.BiLSTM_model import BiLSTM
 from src.training.train import train_model
 from src.training.early_stopping import EarlyStopping
 from pathlib import Path
@@ -49,7 +50,8 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
-scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
+# TODO: Try OneCycleLR
+# scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
 
 criterion = nn.MSELoss() 
 
@@ -61,7 +63,7 @@ history = train_model(
     train_dataset=train_dataset,
     val_dataset=val_dataset,
     optimizer=optimizer,
-    scheduler=scheduler,
+    #scheduler=scheduler,
     criterion=criterion,
     batch_size=config['training']['batch_size'],
     num_epochs=config['training']['num_epochs'],
