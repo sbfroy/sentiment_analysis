@@ -51,6 +51,7 @@ optimizer = optim.Adam(model.parameters(),
                        weight_decay=config['training']['weight_decay'])
 
 # TODO: Try OneCycleLR
+####
 # scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
 
 criterion = nn.MSELoss() 
