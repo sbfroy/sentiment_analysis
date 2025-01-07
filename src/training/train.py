@@ -5,7 +5,8 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criterion, batch_size, num_epochs, device, gradient_clip_val, trial=None, early_stopping=None, verbose=True):
+def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criterion, batch_size, num_epochs, device, 
+                gradient_clip_val, trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -13,9 +14,13 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
 
     model.to(device)
 
-    history = {'train_rmse': [], 'val_rmse': [],
-               'train_r2': [], 'val_r2': [],
-               'lr': []}
+    history = {
+        'train_rmse': [], 
+        'val_rmse': [],
+        'train_r2': [], 
+        'val_r2': [],
+        'lr': []
+    }
 
     for epoch in range(num_epochs):
 
@@ -24,7 +29,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         train_preds = []
         train_targets = []
 
-        for batch in tqdm(train_loader, desc='Training', leave=False, ncols=75, disable=not verbose):
+        for batch in tqdm(train_loader, desc='training', leave=False, ncols=75, disable=not verbose):
             inputs = batch['input_ids'].to(device)
             masks = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
@@ -49,7 +54,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         val_targets = []
 
         with torch.no_grad():
-            for batch in tqdm(val_loader, desc=' Validation', leave=False, ncols=75, disable=not verbose):
+            for batch in tqdm(val_loader, desc='validation', leave=False, ncols=75, disable=not verbose):
                 inputs = batch['input_ids'].to(device)
                 masks = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
@@ -63,16 +68,16 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         val_rmse = np.sqrt(mean_squared_error(val_targets, val_preds))
         val_r2 = r2_score(val_targets, val_preds)
 
-        scheduler.step()
+        #scheduler.step()
 
-        current_lr = scheduler.get_last_lr()[0] 
+        #current_lr = scheduler.get_last_lr()[0] 
 
         # Logging
         history['train_rmse'].append(train_rmse)
         history['train_r2'].append(train_r2)
         history['val_rmse'].append(val_rmse)
         history['val_r2'].append(val_r2)
-        history['lr'].append(current_lr)
+        #history['lr'].append(current_lr)
 
         if verbose:
             print(
