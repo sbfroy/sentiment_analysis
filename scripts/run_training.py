@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from transformers import AutoTokenizer
 from src.utils.config_loader import load_config
 from src.utils.seed import seed_everything
@@ -50,9 +51,8 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
-# TODO: Try OneCycleLR
-####
-# scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
+#scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.01, verbose=True)
 
 criterion = nn.MSELoss() 
 
@@ -64,7 +64,7 @@ history = train_model(
     train_dataset=train_dataset,
     val_dataset=val_dataset,
     optimizer=optimizer,
-    #scheduler=scheduler,
+    scheduler=scheduler,
     criterion=criterion,
     batch_size=config['training']['batch_size'],
     num_epochs=config['training']['num_epochs'],
