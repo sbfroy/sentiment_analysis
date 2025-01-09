@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from transformers import AutoTokenizer
+from transformers import AutoModel
 from src.utils.config_loader import load_config
 from src.utils.seed import seed_everything
 from src.data.dataset import TokenizedDataset
@@ -26,17 +27,21 @@ seed_everything(config['general']['seed'])
 optuna.logging.set_verbosity(optuna.logging.INFO)
 
 tokenizer = AutoTokenizer.from_pretrained('NbAiLab/nb-bert-base')
+transformer = AutoModel.from_pretrained('NbAiLab/nb-bert-base')
 
 # Load data
 train_df = create_df(base_dir / 'data' / 'train')
 val_df = create_df(base_dir / 'data' / 'dev')
 
+embed_layer = transformer.get_input_embeddings()
+pretrained_embed = embed_layer.weight.detach().cpu().numpy()
+
 def objective(trial):
     
     # params to tune
-    hidden_size = trial.suggest_int('hidden_size', 128, 224, step=32)
+    hidden_size = trial.suggest_int('hidden_size', 128, 320, step=32)
     num_layers = trial.suggest_int('num_layers', 3, 5)
-    dropout = trial.suggest_float('dropout', 0.1, 0.4, step=0.05)
+    dropout = trial.suggest_float('dropout', 0.1, 0.5, step=0.05)
     learning_rate = trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
     weight_decay = trial.suggest_float('weight_decay', 1e-5, 1e-3, log=True)
     gradient_clip_val = trial.suggest_float("gradient_clip_val", 0.1, 0.4, log=True)
@@ -46,8 +51,8 @@ def objective(trial):
     val_dataset = TokenizedDataset(val_df, tokenizer, max_seq_len)
 
     model = LSTM(
-        vocab_size=config['model']['vocab_size'],
-        embed_size=config['model']['embed_size'],
+        vocab_size=tokenizer.vocab_size,
+        embed_size=pretrained_embed.shape[1],
         hidden_size=hidden_size,
         num_layers=num_layers,
         dropout=dropout
@@ -76,11 +81,11 @@ def objective(trial):
 
 # Optuna study
 study = optuna.create_study(
-    study_name='my_study',
+    study_name='new_study_w_finetuning',
     direction='minimize', 
     sampler=optuna.samplers.TPESampler(seed=config['general']['seed']),
     load_if_exists=True, 
-    storage='sqlite:///my_study.db'
+    storage='sqlite:///new_study_w_finetuning.db'
 )
 
 study.optimize(objective, n_trials=50, show_progress_bar=True)

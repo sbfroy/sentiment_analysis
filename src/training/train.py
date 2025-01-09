@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criterion, batch_size, num_epochs, device, 
+def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, 
                 gradient_clip_val, trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
@@ -19,7 +19,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         'val_rmse': [],
         'train_r2': [], 
         'val_r2': [],
-        'lr': []
+        #'lr': []
     }
 
     for epoch in range(num_epochs):
@@ -29,7 +29,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         train_preds = []
         train_targets = []
 
-        for batch in tqdm(train_loader, desc='training', leave=False, ncols=75, disable=not verbose):
+        for batch in tqdm(train_loader, desc='train', leave=False, ncols=75, disable=not verbose):
             inputs = batch['input_ids'].to(device)
             masks = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
@@ -54,7 +54,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         val_targets = []
 
         with torch.no_grad():
-            for batch in tqdm(val_loader, desc='validation', leave=False, ncols=75, disable=not verbose):
+            for batch in tqdm(val_loader, desc='val', leave=False, ncols=75, disable=not verbose):
                 inputs = batch['input_ids'].to(device)
                 masks = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
@@ -80,23 +80,20 @@ def train_model(model, train_dataset, val_dataset, optimizer, scheduler, criteri
         #history['lr'].append(current_lr)
 
         if verbose:
-            print(
-                f"Epoch {epoch+1}/{num_epochs} | "
-                f"Train RMSE: {train_rmse:.4f}, Train R^2: {train_r2:.4f} | "
-                f"Val RMSE: {val_rmse:.4f}, Val R^2: {val_r2:.4f}"
-                )
+            print(f'Epoch {epoch+1}/{num_epochs} | ')
+            print(f'Train RMSE: {train_rmse:.4f}, Train R^2: {train_r2:.4f} | ')
+            print(f'Val RMSE: {val_rmse:.4f}, Val R^2: {val_r2:.4f}')
 
         # Optuna
         if trial:
             trial.report(val_rmse, step=epoch)
-
             if trial.should_prune():
                 raise optuna.exceptions.TrialPruned()
         
         if early_stopping:
             early_stopping(val_rmse)
             if early_stopping.stop_training:
-                print("Early stopping triggered!")
+                print("Early stopping!")
                 break
 
     return history
