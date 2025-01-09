@@ -1,15 +1,11 @@
-# with optunas best_params_v3
-
 model:
-  vocab_size: 119547 # tokenizer.vocab_size
-  embed_size: 128
   hidden_size: 128
   num_layers: 3
   dropout: 0.35
 
 training:
   batch_size: 32
-  num_epochs: 40
+  num_epochs: 25
   learning_rate: 0.00016488555876672772
   weight_decay: 2.0921420132719923e-05
   patience: 3
