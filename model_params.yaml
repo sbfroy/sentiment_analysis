@@ -1,19 +1,19 @@
 model:
-  hidden_size: 128
-  num_layers: 3
+  hidden_size: 192
+  num_layers: 5
   dropout: 0.35
 
 training:
   batch_size: 32
   num_epochs: 25
-  learning_rate: 0.00016488555876672772
-  weight_decay: 2.0921420132719923e-05
-  patience: 3
-  min_delta: 0.01
-  gradient_clip_val: 0.13747699699142135
+  learning_rate: 0.0002872811184171888
+  weight_decay: 2.3817800641397103e-05
+  patience: 5
+  min_delta: 0.00001
+  gradient_clip_val: 0.27260196892087624
 
 data:
-  max_seq_len: 704
+  max_seq_len: 544
 
 general:
   seed: 42
