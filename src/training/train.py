@@ -80,9 +80,9 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         #history['lr'].append(current_lr)
 
         if verbose:
-            print(f'Epoch {epoch+1}/{num_epochs} | ')
-            print(f'Train RMSE: {train_rmse:.4f}, Train R^2: {train_r2:.4f} | ')
-            print(f'Val RMSE: {val_rmse:.4f}, Val R^2: {val_r2:.4f}')
+            print(f'Epoch {epoch+1}/{num_epochs} | '
+                  f'Train RMSE: {train_rmse:.4f}, Val RMSE: {val_rmse:.4f} | '
+                  f'Train R2: {train_r2:.4f}, Val R2: {val_r2:.4f}')
 
         # Optuna
         if trial:
