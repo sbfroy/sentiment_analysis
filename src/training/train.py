@@ -68,9 +68,9 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
         val_rmse = np.sqrt(mean_squared_error(val_targets, val_preds))
         val_r2 = r2_score(val_targets, val_preds)
 
-        #scheduler.step()
+        #scheduler.step(val_rmse)
 
-        #current_lr = scheduler.get_last_lr()[0] 
+        #current_lr = optimizer.param_groups[0]['lr']
 
         # Logging
         history['train_rmse'].append(train_rmse)
