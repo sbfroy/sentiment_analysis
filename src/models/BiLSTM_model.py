@@ -2,9 +2,15 @@ import torch
 import torch.nn as nn
 
 class BiLSTM(nn.Module):
-    def __init__(self, vocab_size, embed_size, hidden_size, num_layers, dropout):
+    def __init__(self, vocab_size, embed_size, hidden_size, num_layers, dropout, pretrained_embed=None):
         super(BiLSTM, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
+
+        # Load pretrained embeddings
+        if pretrained_embed is not None:
+            self.embedding.weight = nn.Parameter(torch.tensor(pretrained_embed, dtype=torch.float32))
+            self.embedding.weight.requires_grad = True
+
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
         self.dropout = nn.Dropout(p=dropout)
         self.fc = nn.Linear(hidden_size * 2, 1)
