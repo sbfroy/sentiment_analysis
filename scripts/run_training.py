@@ -6,7 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from transformers import AutoTokenizer
 from transformers import AutoModel
@@ -57,7 +56,6 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
-#scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['num_epochs'])
 #scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.01, verbose=True)
 
 criterion = nn.MSELoss() 
@@ -76,7 +74,7 @@ history = train_model(
     num_epochs=config['training']['num_epochs'],
     device='cuda' if torch.cuda.is_available() else 'cpu',
     gradient_clip_val=config['training']['gradient_clip_val'],
-    #early_stopping=early_stopping
+    early_stopping=early_stopping
 )
 
 # Create individual folders
