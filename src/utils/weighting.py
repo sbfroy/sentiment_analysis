@@ -16,5 +16,5 @@ normalized_class_weights = {interval: weight / len(train_class_counts) for inter
 tensors = torch.tensor(list(normalized_class_weights.values()))
 
 def get_weight(scaled_score):
-    rounded_score = round(scaled_score, 1) # because float precision
+    rounded_score = round(scaled_score, 1) # because floating point uncertainty
     return normalized_class_weights[rounded_score]
