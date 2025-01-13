@@ -1,5 +1,11 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import torch
 from torch.utils.data import DataLoader
+from src.utils.weighting import get_weight
 from sklearn.metrics import mean_squared_error, r2_score
 from tqdm import tqdm
 import numpy as np  
@@ -37,8 +43,15 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
             optimizer.zero_grad()
 
             outputs = model(inputs, masks).squeeze()
+
+            weights = torch.tensor(
+                [get_weight(label.item()) for label in labels],
+                dtype=torch.float
+            ).to(device)
+
             loss = criterion(outputs, labels.to(device))
-            loss.backward()
+            weighted_loss = (loss * weights).mean() 
+            weighted_loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip_val)
             optimizer.step()
 
