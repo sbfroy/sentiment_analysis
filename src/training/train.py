@@ -11,8 +11,7 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, 
-                gradient_clip_val, trial=None, early_stopping=None, verbose=True):
+def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -52,7 +51,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
             loss = criterion(outputs, labels.to(device))
             weighted_loss = (loss * weights).mean() 
             weighted_loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip_val)
+            #torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip_val)
             optimizer.step()
 
             train_preds.extend(outputs.detach().cpu().numpy())  
