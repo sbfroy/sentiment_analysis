@@ -89,4 +89,4 @@ pd.DataFrame(history).to_csv(output_dir / 'history.csv', index=False)
 
 #torch.save(model.state_dict(), output_dir / 'lstm_model.pth')
            
-print(f"Training complete! Saved stuff in {output_dir}")
+print(f'Done! Saved stuff in {output_dir}')
