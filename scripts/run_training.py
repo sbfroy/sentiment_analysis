@@ -42,7 +42,7 @@ embed_layer = transformer.get_input_embeddings()
 pretrained_embed = embed_layer.weight.detach().cpu().numpy()
 
 # Initialize model
-model = LSTM(
+model = BiLSTM(
     vocab_size=tokenizer.vocab_size,
     embed_size=pretrained_embed.shape[1],
     hidden_size=config['model']['hidden_size'],
@@ -56,7 +56,7 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
-#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.01, verbose=True)
+#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.01)
 
 criterion = nn.MSELoss() 
 
@@ -73,8 +73,8 @@ history = train_model(
     batch_size=config['training']['batch_size'],
     num_epochs=config['training']['num_epochs'],
     device='cuda' if torch.cuda.is_available() else 'cpu',
-    gradient_clip_val=config['training']['gradient_clip_val'],
-    early_stopping=early_stopping
+    #gradient_clip_val=config['training']['gradient_clip_val'],
+    #early_stopping=early_stopping
 )
 
 # Create individual folders
