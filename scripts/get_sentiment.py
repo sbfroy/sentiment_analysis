@@ -10,6 +10,7 @@ from src.utils.config_loader import load_config
 from src.models.BiLSTM_model import BiLSTM
 import pandas as pd 
 from pathlib import Path
+from tqdm import tqdm
 
 base_dir = Path(__file__).parent.parent
 
@@ -63,7 +64,9 @@ output = base_dir / 'data' / 'dates_with_sentiment.csv'
 
 data = pd.read_csv(input)
 
-data['score'] = data['text'].apply(get_sentiment) # Score column
+tqdm.pandas()
+
+data['score'] = data['text'].progress_apply(get_sentiment) # Score column
 
 result_data = data[['date', 'id', 'score']]
 result_data.to_csv(output, index=False)
