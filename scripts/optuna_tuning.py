@@ -13,6 +13,7 @@ from src.utils.seed import seed_everything
 from src.data.dataset import TokenizedDataset
 from src.data.preprocessing import create_df
 from src.models.lstm_model import LSTM
+from src.models.BiLSTM_model import BiLSTM
 from src.training.train import train_model
 from pathlib import Path
 import yaml
@@ -39,26 +40,26 @@ pretrained_embed = embed_layer.weight.detach().cpu().numpy()
 def objective(trial):
     
     # params to tune
-    hidden_size = trial.suggest_int('hidden_size', 128, 320, step=32)
-    num_layers = trial.suggest_int('num_layers', 3, 5)
-    dropout = trial.suggest_float('dropout', 0.1, 0.5, step=0.05)
+    #hidden_size = trial.suggest_int('hidden_size', 128, 320, step=32)
+    #num_layers = trial.suggest_int('num_layers', 4, 7)
+    dropout = trial.suggest_float('dropout', 0.2, 0.5, step=0.05)
     learning_rate = trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
-    weight_decay = trial.suggest_float('weight_decay', 1e-5, 1e-3, log=True)
-    gradient_clip_val = trial.suggest_float("gradient_clip_val", 0.1, 0.4, log=True)
-    max_seq_len = trial.suggest_int('max_seq_len', 256, 768, step=32) 
+    #weight_decay = trial.suggest_float('weight_decay', 1e-5, 1e-3, log=True)
+    #gradient_clip_val = trial.suggest_float("gradient_clip_val", 0.1, 0.4, log=True)
+    #max_seq_len = trial.suggest_int('max_seq_len', 256, 768, step=32) 
 
-    train_dataset = TokenizedDataset(train_df, tokenizer, max_seq_len)
-    val_dataset = TokenizedDataset(val_df, tokenizer, max_seq_len)
+    train_dataset = TokenizedDataset(train_df, tokenizer, config['data']['max_seq_len'])
+    val_dataset = TokenizedDataset(val_df, tokenizer, config['data']['max_seq_len'])
 
-    model = LSTM(
+    model = BiLSTM(
         vocab_size=tokenizer.vocab_size,
         embed_size=pretrained_embed.shape[1],
-        hidden_size=hidden_size,
-        num_layers=num_layers,
+        hidden_size=config['model']['hidden_size'],
+        num_layers=config['model']['num_layers'],
         dropout=dropout
     )
 
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate) #, weight_decay=weight_decay)
     criterion = nn.MSELoss()
 
     history = train_model(
@@ -70,7 +71,7 @@ def objective(trial):
         batch_size=config['training']['batch_size'],
         num_epochs=config['training']['num_epochs'],
         device='cuda' if torch.cuda.is_available() else 'cpu',
-        gradient_clip_val=gradient_clip_val,
+        #gradient_clip_val=gradient_clip_val,
         trial=trial,
         verbose=False
     )
@@ -81,11 +82,11 @@ def objective(trial):
 
 # Optuna study
 study = optuna.create_study(
-    study_name='new_study_w_finetuning',
+    study_name='final_study',
     direction='minimize', 
     sampler=optuna.samplers.TPESampler(seed=config['general']['seed']),
     load_if_exists=True, 
-    storage='sqlite:///new_study_w_finetuning.db'
+    storage='sqlite:///final_study.db'
 )
 
 study.optimize(objective, n_trials=50, show_progress_bar=True)
