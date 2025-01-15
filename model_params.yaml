@@ -1,12 +1,12 @@
 model:
   hidden_size: 192
   num_layers: 5
-  dropout: 0.35
+  dropout: 0.35 # 0.4
 
 training:
   batch_size: 32
   num_epochs: 25
-  learning_rate: 0.0002872811184171888
+  learning_rate: 0.0002872811184171888 # 0.0009910988120358127
   weight_decay: 2.3817800641397103e-05
   gradient_clip_val: 0.27260196892087624
   patience: 3
