@@ -33,7 +33,7 @@ model = BiLSTM(
     pretrained_embed=pretrained_embed
 )
 
-model.load_state_dict(torch.load(base_dir / 'src' /'models' / 'BiLSTM_model.pth', weights_only=True))
+model.load_state_dict(torch.load(base_dir / 'src' /'models' / 'BiLSTM_model.pth', weights_only=True)) # Load model weights
 model.to(device)
 model.eval()
 
