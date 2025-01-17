@@ -31,4 +31,6 @@ val_predictions = baseline_model(val_df)
 
 rmse = np.sqrt(mean_squared_error(val_labels, val_predictions))
 
+# Got roughly 0.45 RMSE
+
 print(f"Baseline RMSE on Validation Set: {rmse:.4f}")
