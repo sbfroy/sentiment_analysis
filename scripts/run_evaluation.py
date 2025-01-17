@@ -63,6 +63,8 @@ with torch.no_grad():
 test_rmse = np.sqrt(mean_squared_error(test_labels, test_preds))
 test_r2 = r2_score(test_labels, test_preds)
 
+# Print results
+
 print(f"Test RMSE: {test_rmse}")
 print(f"Test R^2: {test_r2}")
 
@@ -71,7 +73,7 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 results = {
     'Test RMSE': test_rmse,
-    'Test R^2': test_r2
+    'Test R^2': test_r2 
 }
 
 with open(output_dir / 'evaluation_results.yaml', 'w') as f:
