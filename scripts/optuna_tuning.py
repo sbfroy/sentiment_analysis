@@ -42,9 +42,9 @@ def objective(trial):
     # params to tune
     #hidden_size = trial.suggest_int('hidden_size', 128, 320, step=32)
     #num_layers = trial.suggest_int('num_layers', 4, 7)
-    dropout = trial.suggest_float('dropout', 0.2, 0.5, step=0.05)
+    dropout = trial.suggest_float('dropout', 0.0, 0.3, step=0.05)
     learning_rate = trial.suggest_float('learning_rate', 1e-5, 1e-3, log=True)
-    #weight_decay = trial.suggest_float('weight_decay', 1e-5, 1e-3, log=True)
+    weight_decay = trial.suggest_float('weight_decay', 5e-7, 1e-5, log=True)
     #gradient_clip_val = trial.suggest_float("gradient_clip_val", 0.1, 0.4, log=True)
     #max_seq_len = trial.suggest_int('max_seq_len', 256, 768, step=32) 
 
@@ -56,10 +56,11 @@ def objective(trial):
         embed_size=pretrained_embed.shape[1],
         hidden_size=config['model']['hidden_size'],
         num_layers=config['model']['num_layers'],
-        dropout=dropout
+        dropout=dropout,
+        pretrained_embed=pretrained_embed
     )
 
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate) #, weight_decay=weight_decay)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     criterion = nn.MSELoss()
 
     history = train_model(
@@ -82,11 +83,11 @@ def objective(trial):
 
 # Optuna study
 study = optuna.create_study(
-    study_name='final_study',
+    study_name='the_final_study',
     direction='minimize', 
     sampler=optuna.samplers.TPESampler(seed=config['general']['seed']),
     load_if_exists=True, 
-    storage='sqlite:///final_study.db'
+    storage='sqlite:///the_final_study.db'
 )
 
 study.optimize(objective, n_trials=50, show_progress_bar=True)

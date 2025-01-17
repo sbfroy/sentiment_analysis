@@ -56,7 +56,7 @@ optimizer = optim.Adam(model.parameters(),
                        lr=config['training']['learning_rate'],
                        weight_decay=config['training']['weight_decay'])
 
-#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.01)
+#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, threshold=0.1)
 
 criterion = nn.MSELoss() 
 
@@ -74,7 +74,7 @@ history = train_model(
     num_epochs=config['training']['num_epochs'],
     device='cuda' if torch.cuda.is_available() else 'cpu',
     #gradient_clip_val=config['training']['gradient_clip_val'],
-    #early_stopping=early_stopping
+    early_stopping=early_stopping
 )
 
 # Create individual folders
@@ -87,6 +87,6 @@ with open(output_dir / 'params.yaml', 'w') as f:
 
 pd.DataFrame(history).to_csv(output_dir / 'history.csv', index=False)
 
-#torch.save(model.state_dict(), output_dir / 'lstm_model.pth')
+torch.save(model.state_dict(), output_dir / 'BiLSTM_model.pth')
            
 print(f'Done! Saved stuff in {output_dir}')
