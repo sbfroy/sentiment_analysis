@@ -24,7 +24,7 @@ import yaml
 
 base_dir = Path(__file__).parent.parent
 
-config = load_config(base_dir / 'model_params.yaml')
+config = load_config(base_dir / 'BiLSTM_params.yaml')
 
 seed_everything(config['general']['seed'])
 
