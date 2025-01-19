@@ -16,7 +16,7 @@ class TokenizedDataset(Dataset):
         label = self.labels[idx]
 
         # tokenIDs
-        encoding = self.tokenizer.encode_plus(
+        encoding = self.tokenizer(
             text,
             add_special_tokens=True,
             max_length=self.max_len,
@@ -29,7 +29,7 @@ class TokenizedDataset(Dataset):
         
         # return dict with input_ids, attention_mask, and labels
         return {
-            'input_ids': encoding['input_ids'].flatten(),
-            'attention_mask': encoding['attention_mask'].flatten(),
+            'input_ids': encoding['input_ids'].squeeze(0),
+            'attention_mask': encoding['attention_mask'].squeeze(0),
             'labels': torch.tensor(label, dtype=torch.float)
-            }
+        }
