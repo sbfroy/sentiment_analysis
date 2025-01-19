@@ -39,7 +39,7 @@ def objective(trial):
     # params to tune
     dropout = trial.suggest_float('dropout', 0.1, 0.5, step=0.05)
     learning_rate = trial.suggest_float('learning_rate', 3e-6, 5e-4, log=True)
-    weight_decay = trial.suggest_float('weight_decay', 5e-7, 1e-5, log=True) # NOT DECIDED YET
+    weight_decay = trial.suggest_float('weight_decay', 1e-5, 1e-1, log=True) 
     batch_size = trial.suggest_int('batch_size', 8, 32, step=8)
 
     model = TransformerModel(
