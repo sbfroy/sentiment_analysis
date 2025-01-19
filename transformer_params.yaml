@@ -1,0 +1,14 @@
+model:
+  dropout: 0.35 
+
+training:
+  batch_size: 32
+  num_epochs: 8
+  learning_rate: 0.00003
+  weight_decay: 9.453661548813254e-06 # 0.01
+
+data:
+  max_seq_len: 512
+
+general:
+  seed: 42  
