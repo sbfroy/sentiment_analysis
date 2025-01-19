@@ -3,9 +3,9 @@ model:
 
 training:
   batch_size: 32
-  num_epochs: 8
+  num_epochs: 10
   learning_rate: 0.00003
-  weight_decay: 9.453661548813254e-06 # 0.01
+  weight_decay: 0.01
 
 data:
   max_seq_len: 512
