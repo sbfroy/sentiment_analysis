@@ -11,7 +11,8 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
-def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, trial=None, early_stopping=None, verbose=True):
+def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, 
+                trial=None, early_stopping=None, verbose=True):
 
     # Data loaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -41,7 +42,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
 
             optimizer.zero_grad()
 
-            outputs = model(inputs, masks).squeeze()
+            outputs = model(inputs, attention_mask=masks).squeeze()
 
             weights = torch.tensor(
                 [get_weight(label.item()) for label in labels],
@@ -71,7 +72,7 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
                 masks = batch['attention_mask'].to(device)
                 labels = batch['labels'].to(device)
 
-                outputs = model(inputs, masks).squeeze()
+                outputs = model(inputs, attention_mask=masks).squeeze()
                 loss = criterion(outputs, labels.to(device))
 
                 val_preds.extend(outputs.detach().cpu().numpy()) 
