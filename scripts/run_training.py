@@ -13,7 +13,6 @@ from src.utils.config_loader import load_config
 from src.utils.seed import seed_everything
 from src.data.dataset import TokenizedDataset
 from src.data.preprocessing import create_df
-from src.models.lstm_model import LSTM
 from src.models.BiLSTM_model import BiLSTM
 from src.training.train import train_model
 from src.training.early_stopping import EarlyStopping
