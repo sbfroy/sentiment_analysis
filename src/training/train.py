@@ -11,6 +11,23 @@ from tqdm import tqdm
 import numpy as np  
 import optuna
 
+def evaluate_score_ranges(predictions, targets):
+    ranges = [(-1, -0.5), (-0.5, 0), (0, 0.5), (0.5, 1)]
+    results = {}
+    
+    for min, max in ranges:
+        indices = [i for i, t in enumerate(targets) if min <= t < max]
+        range_preds = [predictions[i] for i in indices]
+        range_targets = [targets[i] for i in indices]
+        
+        if range_targets: 
+            rmse = np.sqrt(mean_squared_error(range_targets, range_preds))
+            results[f"{min} to {max}"] = rmse
+        else:
+            results[f"{min} to {max}"] = "No samples in range"
+    
+    return results
+
 def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_size, num_epochs, device, 
                 trial=None, early_stopping=None, verbose=True):
 
@@ -96,6 +113,12 @@ def train_model(model, train_dataset, val_dataset, optimizer, criterion, batch_s
             print(f'Epoch {epoch+1}/{num_epochs} | '
                   f'Train RMSE: {train_rmse:.4f}, Val RMSE: {val_rmse:.4f} | '
                   f'Train R2: {train_r2:.4f}, Val R2: {val_r2:.4f}')
+        
+            range_results = evaluate_score_ranges(val_preds, val_targets)
+            
+            print("Validation RMSE by score range:")
+            for score_range, rmse in range_results.items():
+                print(f"  {score_range}: {rmse}")
 
         # Optuna
         if trial:
